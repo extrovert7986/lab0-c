@@ -113,6 +113,16 @@ int q_size(struct list_head *head)
 bool q_delete_mid(struct list_head *head)
 {
     // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
+    struct list_head **slow, **fast;
+
+    if (!head)
+        return false;
+
+    for (slow = fast = &head; (*fast) && (*fast)->next;
+         slow = &((*slow)->next), fast = &((*fast)->next->next))
+        ;
+
+    *slow = (*slow)->next;
     return true;
 }
 
