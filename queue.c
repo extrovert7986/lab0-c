@@ -73,6 +73,21 @@ bool q_insert_head(struct list_head *head, char *s)
  */
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    element_t *ele = malloc(sizeof(element_t));
+    size_t bufSiz = sizeof(char) * (strlen(s) + 1);
+
+    if (!ele)
+        return false;
+
+    if (!(ele->value = malloc(bufSiz))) {
+        free(ele);
+        return false;
+    }
+
+    ele->value = strncpy(ele->value, s, bufSiz);
+
+    list_add_tail(&ele->list, head);
+
     return true;
 }
 
