@@ -108,7 +108,18 @@ bool q_insert_tail(struct list_head *head, char *s)
  */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (!head || head->next == head)
+        return NULL;
+
+    element_t *tar = list_first_entry(head, element_t, list);
+
+    head->next = tar->list.next;
+    tar->list.next->prev = head;
+
+    if (sp && bufsize > 0) {
+        strncpy(sp, tar->value, bufsize - 1);
+    }
+    return tar;
 }
 
 /*
@@ -117,7 +128,19 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
  */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (!head || head->prev == head)
+        return NULL;
+
+    element_t *tar = list_last_entry(head, element_t, list);
+
+    head->prev = tar->list.prev;
+    tar->list.prev->next = head;
+
+    if (sp && bufsize > 0) {
+        strncpy(sp, tar->value, bufsize - 1);
+    }
+
+    return tar;
 }
 
 /*
