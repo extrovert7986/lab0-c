@@ -29,12 +29,18 @@ struct list_head *q_new()
 /* Free all storage used by queue */
 void q_free(struct list_head *l)
 {
+    struct list_head *cur;
     l->prev->next = NULL;
-    while (l) {
-        struct list_head *tmp = l;
-        l = l->next;
+
+    for (cur = l->next; cur;) {
+        element_t *tmp = list_entry(cur, element_t, list);
+        cur = cur->next;
+        if (tmp->value)
+            free(tmp->value);
         free(tmp);
     }
+
+    free(l);
 }
 
 static inline element_t *e_new(char *s)
