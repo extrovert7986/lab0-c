@@ -37,6 +37,23 @@ void q_free(struct list_head *l)
     }
 }
 
+static inline element_t *e_new(char *s)
+{
+    element_t *ele = malloc(sizeof(element_t));
+    size_t bufSiz = sizeof(char) * (strlen(s) + 1);
+
+    if (!ele)
+        return NULL;
+
+    if (!(ele->value = malloc(bufSiz))) {
+        free(ele);
+        return NULL;
+    }
+
+    ele->value = strncpy(ele->value, s, bufSiz);
+    return ele;
+}
+
 /*
  * Attempt to insert element at head of queue.
  * Return true if successful.
@@ -46,18 +63,7 @@ void q_free(struct list_head *l)
  */
 bool q_insert_head(struct list_head *head, char *s)
 {
-    element_t *ele = malloc(sizeof(element_t));
-    size_t bufSiz = sizeof(char) * (strlen(s) + 1);
-
-    if (!ele)
-        return false;
-
-    if (!(ele->value = malloc(bufSiz))) {
-        free(ele);
-        return false;
-    }
-
-    ele->value = strncpy(ele->value, s, bufSiz);
+    element_t *ele = e_new(s);
 
     list_add(&ele->list, head);
 
@@ -73,18 +79,7 @@ bool q_insert_head(struct list_head *head, char *s)
  */
 bool q_insert_tail(struct list_head *head, char *s)
 {
-    element_t *ele = malloc(sizeof(element_t));
-    size_t bufSiz = sizeof(char) * (strlen(s) + 1);
-
-    if (!ele)
-        return false;
-
-    if (!(ele->value = malloc(bufSiz))) {
-        free(ele);
-        return false;
-    }
-
-    ele->value = strncpy(ele->value, s, bufSiz);
+    element_t *ele = e_new(s);
 
     list_add_tail(&ele->list, head);
 
