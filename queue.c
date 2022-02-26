@@ -251,9 +251,82 @@ void q_reverse(struct list_head *head)
     } while (current != head);
 }
 
+struct list_head *q_merge_sort(struct list_head *head);
+
 /*
  * Sort elements of queue in ascending order
  * No effect if q is NULL or empty. In addition, if q has only one
  * element, do nothing.
  */
-void q_sort(struct list_head *head) {}
+void q_sort(struct list_head *head)
+{
+    struct list_head *last;
+
+    if (!head || head->next == head || head->next->next == head)
+        return;
+
+    head->prev->next = NULL;
+    head->next = q_merge_sort(head->next);
+
+    for (last = head; last->next; last = last->next) {
+        last->next->prev = last;
+    }
+    head->prev = last;
+    last->next = head;
+}
+
+struct list_head *q_devide(struct list_head *head)
+{
+    struct list_head **slow, **fast, *retVal;
+
+    for (slow = fast = &(head); *fast && (*fast)->next;
+         slow = &((*slow)->next), fast = &((*fast)->next->next))
+        ;
+    retVal = *slow;
+    *slow = NULL;
+
+    return retVal;
+}
+
+#define list_val(l) list_entry(l, element_t, list)->value
+
+struct list_head *q_merge(struct list_head *l1, struct list_head *l2)
+{
+    struct list_head *indirect, head;
+
+    indirect = &head;
+
+    while (l1 && l2) {
+        if (strcmp(list_val(l1), list_val(l2)) < 0) {
+            indirect->next = l1;
+            l1 = l1->next;
+        } else {
+            indirect->next = l2;
+            l2 = l2->next;
+        }
+        indirect = indirect->next;
+    }
+    indirect->next =
+        (struct list_head *) ((unsigned long int) l1 | (unsigned long int) l2);
+
+    return head.next;
+}
+
+/**
+ * sort list_head without include the first member
+ */
+struct list_head *q_merge_sort(struct list_head *head)
+{
+    struct list_head *fir, *sec;
+
+    if (!head || !head->next)
+        return head;
+
+    fir = head;
+    sec = q_devide(fir);
+
+    fir = q_merge_sort(fir);
+    sec = q_merge_sort(sec);
+
+    return q_merge(fir, sec);
+}
