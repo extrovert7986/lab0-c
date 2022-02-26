@@ -11,6 +11,8 @@
  *   cppcheck-suppress nullPointer
  */
 
+#define list_val(l) list_entry(l, element_t, list)->value
+
 /*
  * Create empty queue.
  * Return NULL if could not allocate space.
@@ -26,6 +28,17 @@ struct list_head *q_new()
     return q;
 }
 
+static inline void q_delete_node(struct list_head *node)
+{
+    if (!node)
+        return;
+
+    element_t *tmp = list_entry(node, element_t, list);
+    if (tmp->value)
+        free(tmp->value);
+    free(tmp);
+}
+
 /* Free all storage used by queue */
 void q_free(struct list_head *l)
 {
@@ -36,11 +49,9 @@ void q_free(struct list_head *l)
     l->prev->next = NULL;
 
     for (cur = l->next; cur;) {
-        element_t *tmp = list_entry(cur, element_t, list);
+        struct list_head *tmp = cur;
         cur = cur->next;
-        if (tmp->value)
-            free(tmp->value);
-        free(tmp);
+        q_delete_node(tmp);
     }
 
     free(l);
@@ -227,7 +238,28 @@ bool q_delete_mid(struct list_head *head)
  */
 bool q_delete_dup(struct list_head *head)
 {
+    if (!head)
+        return false;
+
     // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
+    for (struct list_head *cur = head->next; cur && cur != head;) {
+        bool isRemove = false;
+        while (cur->next != head &&
+               !strcmp(list_val(cur), list_val(cur->next))) {
+            isRemove = true;
+            cur->next = cur->next->next;
+            q_delete_node(cur->next->prev);
+        }
+        if (isRemove) {
+            struct list_head *tmp = cur;
+            cur->prev->next = cur->next;
+            cur->next->prev = cur->prev;
+            cur = cur->next;
+            q_delete_node(tmp);
+        } else {
+            cur = cur->next;
+        }
+    }
     return true;
 }
 
@@ -302,8 +334,6 @@ struct list_head *q_devide(struct list_head *head)
 
     return retVal;
 }
-
-#define list_val(l) list_entry(l, element_t, list)->value
 
 struct list_head *q_merge(struct list_head *l1, struct list_head *l2)
 {
