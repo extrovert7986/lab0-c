@@ -144,6 +144,7 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 
     if (sp && bufsize > 0) {
         strncpy(sp, tar->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
     }
     return tar;
 }
@@ -164,6 +165,7 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 
     if (sp && bufsize > 0) {
         strncpy(sp, tar->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
     }
 
     return tar;
