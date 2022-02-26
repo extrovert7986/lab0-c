@@ -30,6 +30,9 @@ struct list_head *q_new()
 void q_free(struct list_head *l)
 {
     struct list_head *cur;
+
+    if (!l)
+        return;
     l->prev->next = NULL;
 
     for (cur = l->next; cur;) {
@@ -69,7 +72,13 @@ static inline element_t *e_new(char *s)
  */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (!head)
+        return false;
+
     element_t *ele = e_new(s);
+
+    if (!ele)
+        return false;
 
     list_add(&ele->list, head);
 
@@ -85,7 +94,13 @@ bool q_insert_head(struct list_head *head, char *s)
  */
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    if (!head)
+        return false;
+
     element_t *ele = e_new(s);
+
+    if (!ele)
+        return false;
 
     list_add_tail(&ele->list, head);
 
