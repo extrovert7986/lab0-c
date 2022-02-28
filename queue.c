@@ -271,11 +271,18 @@ bool q_delete_dup(struct list_head *head)
 void q_swap(struct list_head *head)
 {
     struct list_head *fir, *sec;
-    for (fir = head->next, sec = fir->next; fir != head && sec != head;
-         fir->prev->next = sec, sec->next->prev = fir, fir->next = sec->next,
-        sec->prev = fir->prev, fir->prev = sec, sec->next = fir,
-        fir = fir->next, sec = fir->next)
-        ;
+
+    list_for_each (fir, head) {
+        sec = fir->next;
+        if (sec == head)
+            return;
+        fir->prev->next = sec;
+        sec->next->prev = fir;
+        fir->next = sec->next;
+        sec->prev = fir->prev;
+        fir->prev = sec;
+        sec->next = fir;
+    }
 }
 
 /*
